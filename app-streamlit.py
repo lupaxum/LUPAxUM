@@ -84,7 +84,7 @@ st.write("Enter the soil and environmental conditions to predict the best crop."
 with st.sidebar:
     st.header("Navigation")
     st.page_link("https://weather.com", label="🌦️ Weather Forecast")
-    st.page_link("https://www.soilcropadvisor.site/help", label="📖 Help & Guides")
+    #st.page_link("https://www.soilcropadvisor.site/help", label="📖 Help & Guides")
 
 # Input fields
 N = st.number_input("Nitrogen (N) (mg/kg)", min_value=0.0, max_value=300.0, value=50.0, step=1.0)
