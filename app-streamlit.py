@@ -185,26 +185,62 @@ if st.button("Predict Crop", use_container_width=True):
                 unsafe_allow_html=True
             )
 
+    #with col2:
+    #    container = st.container(border=True)
+     #   container.subheader("5 Recommended Crops")
+#
+ #       for crop, prob in zip(top_5_crops, top_5_probs):
+  #          readable_crop = get_readable_crop_name(crop)  # Convert shortcut name
+#
+ #           # Determine text color based on probability
+  #          percentage = prob * 100
+   #         if percentage >= 50:
+    #            color = "darkgreen"
+     #       elif 20 <= percentage < 50:
+      #          color = "darkgoldenrod"  # Dark Yellow
+       #     else:
+        #        color = "darkred"
+
+            # Format output with bold text and colored percentage
+         #   container.markdown(
+          #      f"{readable_crop}: <span style='color:{color}; font-weight:bold;'>{percentage:.2f}%</span>", 
+           #     unsafe_allow_html=True
+            #)
+
     with col2:
         container = st.container(border=True)
         container.subheader("5 Recommended Crops")
 
+        classifications = {
+            "Good for Planting ✅": {"range": (80, 100), "color": "darkgreen", "description": 
+                "The soil is in excellent condition and supports healthy crop growth with minimal maintenance required."},
+            "Fair/Manageable 🌤️": {"range": (50, 79), "color": "goldenrod", "description": 
+                "The land is suitable for planting but requires minor adjustments for optimal yield."},
+            "Needs Improvement ⚠️": {"range": (16, 49), "color": "darkorange", "description": 
+                "The soil has potential but requires intervention such as fertilizers, compost, or irrigation adjustments to be viable."},
+            "Not Recommended 🚨": {"range": (0, 15), "color": "darkred", "description": 
+                "The soil is highly unsuitable for planting and needs major rehabilitation, such as pH correction and organic matter addition."}
+        }
+
+        categorized_crops = {key: [] for key in classifications.keys()}
+
         for crop, prob in zip(top_5_crops, top_5_probs):
-            readable_crop = get_readable_crop_name(crop)  # Convert shortcut name
+            readable_crop = get_readable_crop_name(crop)  
+            percentage = prob * 100  
 
-            # Determine text color based on probability
-            percentage = prob * 100
-            if percentage >= 50:
-                color = "darkgreen"
-            elif 20 <= percentage < 50:
-                color = "darkgoldenrod"  # Dark Yellow
-            else:
-                color = "darkred"
+            for category, details in classifications.items():
+                if details["range"][0] <= percentage <= details["range"][1]:
+                    categorized_crops[category].append((readable_crop, percentage, details["color"]))
+                    break  
 
-            # Format output with bold text and colored percentage
-            container.markdown(
-                f"{readable_crop}: <span style='color:{color}; font-weight:bold;'>{percentage:.2f}%</span>", 
-                unsafe_allow_html=True
-            )
+        for category, crops in categorized_crops.items():
+            if crops:
+                container.markdown(f"<h3 style='color:black; margin-bottom:5px;'>{category}</h3>", unsafe_allow_html=True)
+                
+                for crop, percentage, color in crops:
+                    container.markdown(
+                        f"<p style='font-size:18px; font-weight:bold; color:{color}; margin:3px 0; line-height:1.2;'>{crop}: {percentage:.2f}%</p>", 
+                        unsafe_allow_html=True
+                    )
 
-
+                container.markdown(f"<p style='font-size:15px; color:black; margin-top:2px;'>{classifications[category]['description']}</p>", unsafe_allow_html=True)
