@@ -156,17 +156,34 @@ if st.button("Predict Crop", use_container_width=True):
         # Display the associated image for the top predicted crop
         readable_predicted_crop = get_readable_crop_name(top_5_crops[0])
         predicted_crop = top_5_crops[0]
-        st.info(f"Recommended Crop | {readable_predicted_crop}")
+        st.markdown(
+            f"""
+            <div style="background-color: #d4edda; padding: 10px; border-radius: 5px; border-left: 5px solid #155724; padding-bottom: 5px;">
+                <h5 style="margin: 0; padding-bottom: 2px;">Recommended Crop</h5>
+                <p style="font-size: 24px; font-weight: bold; margin: 0;">{readable_predicted_crop}</p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-        with st.expander("See more about " + readable_predicted_crop):
-            # Display associated image if available
-            selected_image = images.get(predicted_crop)
-            if selected_image:
-                st.image(selected_image, use_container_width=True)
+        # Display associated image if available
+        selected_image = images.get(predicted_crop)
+        if selected_image:
+            st.image(selected_image, use_container_width=True)
 
-            selected_link = links.get(predicted_crop) 
-            if selected_link :
-                st.page_link(selected_link, label="Learn More")
+        # Display "Learn More" as a button
+        selected_link = links.get(predicted_crop)
+        if selected_link:
+            st.markdown(
+                f"""
+                <a href="{selected_link}" target="_blank" 
+                style="display: inline-block; padding: 8px 12px; background-color: #d4edda; 
+                        color: black; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    Learn More
+                </a>
+                """,
+                unsafe_allow_html=True
+            )
 
     with col2:
         container = st.container(border=True)
