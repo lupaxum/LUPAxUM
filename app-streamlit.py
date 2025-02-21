@@ -66,7 +66,7 @@ links = {
 st.set_page_config(
     page_title="LUPA | Land Utilization and Production Advisor",
     page_icon="🍃",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
     menu_items={
         #'Weather Forecast': 'https://weather.com',
         'Get Help': 'https://www.soilcropadvisor.site/help',
@@ -77,14 +77,13 @@ st.set_page_config(
 
 #st.link_button("Go back to the Old Dashboard", "https://www.soilcropadvisor.site")
 st.image("static/logo.png")
-st.title("Crop Recommendation")
+st.title("CROP RECOMMENDATION")
 st.write("Enter the soil and environmental conditions to predict the best crop.")
 
 # Ensure the sidebar has content
 with st.sidebar:
-    st.header("Navigation")
+    st.header("> MORE")
     st.page_link("https://weather.com", label="🌦️ Weather Forecast")
-    #st.page_link("https://www.soilcropadvisor.site/help", label="📖 Help & Guides")
 
 # Input fields
 N = st.number_input("Nitrogen (N) (mg/kg)", min_value=0.0, max_value=300.0, value=50.0, step=1.0)
@@ -109,6 +108,35 @@ rainfall = st.number_input("Rainfall (mm)", min_value=0.0, max_value=300.0, valu
 #        if selected_image:
 #            st.image(selected_image, caption=predicted_crop[0], use_container_width=True)
 
+
+crop_name_mapping = {
+    "rice" : "Rice",
+    "chickpea" : "Chick Peas",
+    "kidneybeans": "Kidney Beans",
+    "maize": "Maize (Corn)",
+    "pigeonpeas": "Pigeon Peas",
+    "mothbeans": "Moth Beans",
+    "mungbean": "Mung Beans",
+    "blackgram": "Black Gram",
+    "lentil": "Lentils",
+    "jute": "Jute",
+    "cotton": "Cotton",
+    "coconut": "Coconut",
+    "pomegranate" : "Pomegranate",
+    "banana" : "Banana",
+    "mango" : "Mango",
+    "grapes" : "Grapes",
+    "watermelon" : "Watermelon",
+    "muskmelon" : "Muskmelon",
+    "apple" : "Apple",
+    "orange" : "Orange",
+    "papaya" : "Papaya",
+    "coffee" : "Coffee"
+}
+
+def get_readable_crop_name(crop_key):
+    return crop_name_mapping.get(crop_key, crop_key)
+
 # Prediction
 if st.button("Predict Crop", use_container_width=True):
     input_data = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
@@ -126,10 +154,11 @@ if st.button("Predict Crop", use_container_width=True):
     col1, col2 = st.columns(2)
     with col1:
         # Display the associated image for the top predicted crop
+        readable_predicted_crop = get_readable_crop_name(top_5_crops[0])
         predicted_crop = top_5_crops[0]
-        st.info(f"Recommended Crop: {predicted_crop}")
+        st.info(f"Recommended Crop | {readable_predicted_crop}")
 
-        with st.expander("See more about " + predicted_crop):
+        with st.expander("See more about " + readable_predicted_crop):
             # Display associated image if available
             selected_image = images.get(predicted_crop)
             if selected_image:
@@ -141,7 +170,24 @@ if st.button("Predict Crop", use_container_width=True):
 
     with col2:
         container = st.container(border=True)
-        container.subheader("5 Recommended Crops:")
+        container.subheader("5 Recommended Crops")
+
         for crop, prob in zip(top_5_crops, top_5_probs):
-            container.write(f"{crop}: {prob * 100:.2f}%")
+            readable_crop = get_readable_crop_name(crop)  # Convert shortcut name
+
+            # Determine text color based on probability
+            percentage = prob * 100
+            if percentage >= 50:
+                color = "darkgreen"
+            elif 20 <= percentage < 50:
+                color = "darkgoldenrod"  # Dark Yellow
+            else:
+                color = "darkred"
+
+            # Format output with bold text and colored percentage
+            container.markdown(
+                f"{readable_crop}: <span style='color:{color}; font-weight:bold;'>{percentage:.2f}%</span>", 
+                unsafe_allow_html=True
+            )
+
 
